@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="format-detection" content="telephone=no">
+  <meta name="msapplication-tap-highlight" content="no">
+  <script src="https://unpkg.com/peerjs@1.0.0/dist/peerjs.min.js"></script>
+</head>
+<body>
+<table>
+  <tr>
+    <td>
+      <label for="own">
+        own id
+      </label>
+    </td>
+    <td>
+      <input id="own">
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <label for="peer">
+        peer id
+      </label>
+    </td>
+    <td>
+      <input id="peer"/>
+    </td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <button onclick="connect()">Connect</button>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <label for="msg">
+        message
+      </label>
+    </td>
+    <td>
+      <textarea id="msg"></textarea>
+    </td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>
+      <button onclick="send()">Send Message</button>
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <label for="log">
+        log
+      </label>
+    </td>
+    <td>
+      <textarea id="log"></textarea>
+    </td>
+  </tr>
+</table>
+<script>
+  var peer = new Peer();
+  var log = document.getElementById('log');
+  var msg = document.getElementById('msg');
+
+  peer.on('open', function(id) {
+    console.log('self id:', id);
+    document.getElementById('own').value = id;
+  });
+
+  var conn;
+
+  function send() {
+    conn.send(msg.value);
+    msg.value = '';
+  }
+
+  function connect() {
+    var id = document.getElementById('peer').value;
+    conn = peer.connect(id);
+    // on open will be launch when you successfully connect to PeerServer
+    conn.on('open', function() {
+      // here you have conn.id
+      log.value = 'connected\n' + log.value;
+    });
+  }
+
+  peer.on('connection', function(conn) {
+    console.log(conn.id);
+    conn.on('data', function(data) {
+      log.value = data.toString() + '\n' + log.value;
+    });
+  });
+</script>
+</body>
+</html>
+
+
